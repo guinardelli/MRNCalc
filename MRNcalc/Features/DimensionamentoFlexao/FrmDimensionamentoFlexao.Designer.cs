@@ -110,24 +110,25 @@ partial class FrmDimensionamentoFlexao
         tableLayoutMain.Dock = DockStyle.Fill;
         tableLayoutMain.Location = new Point(0, 0);
         tableLayoutMain.Name = "tableLayoutMain";
-        tableLayoutMain.Padding = new Padding(10);
+        tableLayoutMain.Padding = new Padding(8);
         tableLayoutMain.RowCount = 7;
-        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 80F));
-        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
+        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 85F));
+        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 60F));
+        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 85F));
+        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 55F));
         tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 100F));
-        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 70F));
-        tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.Absolute, 90F));
         tableLayoutMain.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        tableLayoutMain.Size = new Size(520, 550);
+        tableLayoutMain.Size = new Size(520, 450);
 
         // 
         // grpNorma
         // 
         grpNorma.Dock = DockStyle.Fill;
+        grpNorma.Padding = new Padding(5);
         grpNorma.Text = "Norma";
         rdbNBR6118.AutoSize = true;
-        rdbNBR6118.Location = new Point(10, 22);
+        rdbNBR6118.Location = new Point(10, 18);
         rdbNBR6118.Text = "NBR 6118 / 2023";
         rdbNBR6118.Checked = true;
         grpNorma.Controls.Add(rdbNBR6118);
@@ -136,20 +137,21 @@ partial class FrmDimensionamentoFlexao
         // grpSecao
         // 
         grpSecao.Dock = DockStyle.Fill;
+        grpSecao.Padding = new Padding(5);
         grpSecao.Text = "Seção Transversal";
         lblLargura.AutoSize = true;
-        lblLargura.Location = new Point(10, 25);
+        lblLargura.Location = new Point(10, 22);
         lblLargura.Text = "Largura (cm)";
         txtLargura.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtLargura.Location = new Point(110, 22);
-        txtLargura.Size = new Size(80, 23);
+        txtLargura.Location = new Point(110, 19);
+        txtLargura.Size = new Size(100, 23);
         txtLargura.Text = "20";
         lblAltura.AutoSize = true;
-        lblAltura.Location = new Point(10, 55);
+        lblAltura.Location = new Point(10, 50);
         lblAltura.Text = "Altura (cm)";
         txtAltura.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtAltura.Location = new Point(110, 52);
-        txtAltura.Size = new Size(80, 23);
+        txtAltura.Location = new Point(110, 47);
+        txtAltura.Size = new Size(100, 23);
         txtAltura.Text = "60";
         grpSecao.Controls.Add(lblLargura);
         grpSecao.Controls.Add(txtLargura);
@@ -160,13 +162,14 @@ partial class FrmDimensionamentoFlexao
         // grpCarregamento
         // 
         grpCarregamento.Dock = DockStyle.Fill;
+        grpCarregamento.Padding = new Padding(5);
         grpCarregamento.Text = "Carregamento";
         lblMomento.AutoSize = true;
-        lblMomento.Location = new Point(10, 26);
+        lblMomento.Location = new Point(10, 22);
         lblMomento.Text = "Momento Caract. (tf m)";
         txtMomento.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtMomento.Location = new Point(150, 22);
-        txtMomento.Size = new Size(40, 23);
+        txtMomento.Location = new Point(150, 19);
+        txtMomento.Size = new Size(60, 23);
         txtMomento.Text = "5";
         grpCarregamento.Controls.Add(lblMomento);
         grpCarregamento.Controls.Add(txtMomento);
@@ -175,23 +178,24 @@ partial class FrmDimensionamentoFlexao
         // grpMateriais
         // 
         grpMateriais.Dock = DockStyle.Fill;
+        grpMateriais.Padding = new Padding(5);
         grpMateriais.Text = "Materiais";
         lblFck.AutoSize = true;
-        lblFck.Location = new Point(10, 25);
+        lblFck.Location = new Point(10, 22);
         lblFck.Text = "Concreto fck (MPa)";
         cmbFck.DropDownStyle = ComboBoxStyle.DropDownList;
         cmbFck.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        cmbFck.Location = new Point(130, 22);
-        cmbFck.Size = new Size(60, 23);
+        cmbFck.Location = new Point(130, 19);
+        cmbFck.Size = new Size(80, 23);
         cmbFck.Items.AddRange(new object[] { "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90" });
         cmbFck.SelectedIndex = 2; // 30
         lblFyk.AutoSize = true;
-        lblFyk.Location = new Point(10, 55);
+        lblFyk.Location = new Point(10, 50);
         lblFyk.Text = "Aço fy (MPa)";
         cmbFyk.DropDownStyle = ComboBoxStyle.DropDownList;
         cmbFyk.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        cmbFyk.Location = new Point(130, 52);
-        cmbFyk.Size = new Size(60, 23);
+        cmbFyk.Location = new Point(130, 47);
+        cmbFyk.Size = new Size(80, 23);
         cmbFyk.Items.AddRange(new object[] { "500", "600" });
         cmbFyk.SelectedIndex = 0;
         grpMateriais.Controls.Add(lblFck);
@@ -203,13 +207,14 @@ partial class FrmDimensionamentoFlexao
         // grpArmaduras
         // 
         grpArmaduras.Dock = DockStyle.Fill;
+        grpArmaduras.Padding = new Padding(5);
         grpArmaduras.Text = "Armaduras";
         lblDistArmaduras.AutoSize = true;
-        lblDistArmaduras.Location = new Point(10, 26);
+        lblDistArmaduras.Location = new Point(10, 22);
         lblDistArmaduras.Text = "Dist. entre faces e armaduras (cm)";
-        txtDistArmaduras.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtDistArmaduras.Location = new Point(180, 22);
-        txtDistArmaduras.Size = new Size(20, 23);
+        txtDistArmaduras.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        txtDistArmaduras.Location = new Point(210, 19);
+        txtDistArmaduras.Size = new Size(60, 23);
         txtDistArmaduras.Text = "5";
         grpArmaduras.Controls.Add(lblDistArmaduras);
         grpArmaduras.Controls.Add(txtDistArmaduras);
@@ -218,21 +223,22 @@ partial class FrmDimensionamentoFlexao
         // grpLimiteLinhaNeutra
         // 
         grpLimiteLinhaNeutra.Dock = DockStyle.Fill;
+        grpLimiteLinhaNeutra.Padding = new Padding(5);
         grpLimiteLinhaNeutra.Text = "Limite Linha Neutra";
         rdbLimiteAutomatico.AutoSize = true;
-        rdbLimiteAutomatico.Location = new Point(10, 22);
+        rdbLimiteAutomatico.Location = new Point(10, 18);
         rdbLimiteAutomatico.Text = "Automática";
         rdbLimiteAutomatico.Checked = true;
         rdbLimiteDefinir.AutoSize = true;
-        rdbLimiteDefinir.Location = new Point(10, 45);
+        rdbLimiteDefinir.Location = new Point(10, 38);
         rdbLimiteDefinir.Text = "Definir";
         rdbLimiteDefinir.CheckedChanged += rdbLimiteDefinir_CheckedChanged;
         lblLimiteValor.AutoSize = true;
-        lblLimiteValor.Location = new Point(80, 47);
+        lblLimiteValor.Location = new Point(70, 40);
         lblLimiteValor.Text = "Limite Relativo (x/d)";
-        txtLimiteRelativo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtLimiteRelativo.Location = new Point(170, 44);
-        txtLimiteRelativo.Size = new Size(30, 23);
+        txtLimiteRelativo.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+        txtLimiteRelativo.Location = new Point(180, 37);
+        txtLimiteRelativo.Size = new Size(50, 23);
         txtLimiteRelativo.Text = "0.45";
         txtLimiteRelativo.Enabled = false;
         grpLimiteLinhaNeutra.Controls.Add(rdbLimiteAutomatico);
@@ -244,41 +250,42 @@ partial class FrmDimensionamentoFlexao
         // grpPonderadores
         // 
         grpPonderadores.Dock = DockStyle.Fill;
+        grpPonderadores.Padding = new Padding(5);
         grpPonderadores.Text = "Ponderadores";
         lblGammaF.AutoSize = true;
-        lblGammaF.Location = new Point(10, 25);
+        lblGammaF.Location = new Point(10, 22);
         lblGammaF.Text = "Forças (γf)";
         txtGammaF.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtGammaF.Location = new Point(150, 22);
-        txtGammaF.Size = new Size(60, 23);
+        txtGammaF.Location = new Point(120, 19);
+        txtGammaF.Size = new Size(80, 23);
         txtGammaF.Text = "1.4";
         lblGammaC.AutoSize = true;
-        lblGammaC.Location = new Point(10, 50);
+        lblGammaC.Location = new Point(10, 48);
         lblGammaC.Text = "Concreto (γc)";
         txtGammaC.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtGammaC.Location = new Point(150, 47);
-        txtGammaC.Size = new Size(60, 23);
+        txtGammaC.Location = new Point(120, 45);
+        txtGammaC.Size = new Size(80, 23);
         txtGammaC.Text = "1.4";
         lblGammaS.AutoSize = true;
-        lblGammaS.Location = new Point(10, 75);
+        lblGammaS.Location = new Point(10, 74);
         lblGammaS.Text = "Aço (γs)";
         txtGammaS.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtGammaS.Location = new Point(150, 72);
-        txtGammaS.Size = new Size(60, 23);
+        txtGammaS.Location = new Point(120, 71);
+        txtGammaS.Size = new Size(80, 23);
         txtGammaS.Text = "1.15";
         lblKtc.AutoSize = true;
         lblKtc.Location = new Point(10, 100);
         lblKtc.Text = "Longa Duração (ktc)";
         txtKtc.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtKtc.Location = new Point(150, 97);
-        txtKtc.Size = new Size(60, 23);
+        txtKtc.Location = new Point(120, 97);
+        txtKtc.Size = new Size(80, 23);
         txtKtc.Text = "0.85";
         lblRedist.AutoSize = true;
-        lblRedist.Location = new Point(10, 125);
+        lblRedist.Location = new Point(10, 126);
         lblRedist.Text = "Redistr. Momentos (%)";
         txtRedist.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtRedist.Location = new Point(150, 122);
-        txtRedist.Size = new Size(60, 23);
+        txtRedist.Location = new Point(120, 123);
+        txtRedist.Size = new Size(80, 23);
         txtRedist.Text = "1";
         grpPonderadores.Controls.Add(lblGammaF);
         grpPonderadores.Controls.Add(txtGammaF);
@@ -295,33 +302,34 @@ partial class FrmDimensionamentoFlexao
         // grpResultados
         // 
         grpResultados.Dock = DockStyle.Fill;
+        grpResultados.Padding = new Padding(5);
         grpResultados.Text = "Resultados";
         lblAs.AutoSize = true;
-        lblAs.Location = new Point(10, 25);
+        lblAs.Location = new Point(10, 22);
         lblAs.Text = "As (cm²)";
         txtAs.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtAs.Location = new Point(120, 22);
+        txtAs.Location = new Point(100, 19);
         txtAs.Size = new Size(100, 23);
         txtAs.ReadOnly = true;
         lblAsLinha.AutoSize = true;
-        lblAsLinha.Location = new Point(10, 60);
+        lblAsLinha.Location = new Point(10, 50);
         lblAsLinha.Text = "As' (cm²)";
         txtAsLinha.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtAsLinha.Location = new Point(120, 57);
+        txtAsLinha.Location = new Point(100, 47);
         txtAsLinha.Size = new Size(100, 23);
         txtAsLinha.ReadOnly = true;
         lblProfRelativa.AutoSize = true;
-        lblProfRelativa.Location = new Point(10, 95);
+        lblProfRelativa.Location = new Point(10, 78);
         lblProfRelativa.Text = "Prof. Relativa (x/d)";
         txtProfRelativa.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtProfRelativa.Location = new Point(150, 92);
+        txtProfRelativa.Location = new Point(130, 75);
         txtProfRelativa.Size = new Size(70, 23);
         txtProfRelativa.ReadOnly = true;
         lblProfLinhaNeutra.AutoSize = true;
-        lblProfLinhaNeutra.Location = new Point(10, 130);
-        lblProfLinhaNeutra.Text = "Prof. da linha neutra (cm)";
+        lblProfLinhaNeutra.Location = new Point(10, 106);
+        lblProfLinhaNeutra.Text = "Prof. linha neutra (cm)";
         txtProfLinhaNeutra.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-        txtProfLinhaNeutra.Location = new Point(170, 127);
+        txtProfLinhaNeutra.Location = new Point(150, 103);
         txtProfLinhaNeutra.Size = new Size(50, 23);
         txtProfLinhaNeutra.ReadOnly = true;
         grpResultados.Controls.Add(lblAs);
@@ -346,7 +354,7 @@ partial class FrmDimensionamentoFlexao
         // statusStrip
         // 
         statusStrip.Items.AddRange(new ToolStripItem[] { lblStatus });
-        statusStrip.Location = new Point(0, 550);
+        statusStrip.Location = new Point(0, 450);
         statusStrip.Name = "statusStrip";
         statusStrip.Size = new Size(520, 22);
         lblStatus.Name = "lblStatus";
@@ -372,11 +380,11 @@ partial class FrmDimensionamentoFlexao
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
         AutoScaleMode = AutoScaleMode.Font;
-        ClientSize = new Size(520, 572);
+        ClientSize = new Size(520, 472);
         Controls.Add(tableLayoutMain);
         Controls.Add(statusStrip);
         FormBorderStyle = FormBorderStyle.Sizable;
-        MinimumSize = new Size(520, 572);
+        MinimumSize = new Size(520, 472);
         StartPosition = FormStartPosition.CenterScreen;
         Text = "Dimensionamento a Flexão Simples - v2.0";
         ResumeLayout(false);
