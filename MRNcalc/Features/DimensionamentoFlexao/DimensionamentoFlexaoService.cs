@@ -5,7 +5,8 @@ namespace MRNcalc.Features.DimensionamentoFlexao;
 
 /// <summary>
 /// Serviço responsável pelos cálculos de dimensionamento à flexão simples.
-/// Implementa a lógica de engenharia conforme NBR 6118:2023 e Eurocode 2.
+/// Implementa a lógica de engenharia conforme NBR 6118:2023.
+/// Baseado no método do momento reduzido.
 /// </summary>
 public class DimensionamentoFlexaoService
 {
@@ -30,91 +31,148 @@ public class DimensionamentoFlexaoService
         if (input.DistFacesArmadurasCm >= input.AlturaCm / 2.0)
             throw new ArgumentException("A distância entre faces e armaduras deve ser menor que metade da altura da seção.");
 
-        // Determinar limite relativo da linha neutra
-        double limiteRelativo = DeterminarLimiteRelativo(input);
-
-        if (limiteRelativo <= EngineeringConstants.LimiteRelativoMinimo || 
-            limiteRelativo >= EngineeringConstants.LimiteRelativoMaximo)
-            throw new ArgumentException($"O limite relativo da linha neutra deve estar entre {EngineeringConstants.LimiteRelativoMinimo} e {EngineeringConstants.LimiteRelativoMaximo}.");
-
-        // Conversões de unidades
-        double b = input.LarguraCm / EngineeringConstants.ConversaoCmParaM;              // m
-        double h = input.AlturaCm / EngineeringConstants.ConversaoCmParaM;                 // m
-        double dLinha = input.DistFacesArmadurasCm / EngineeringConstants.ConversaoCmParaM; // m
-        double d = h - dLinha;                                                             // m
+        // Geometria em centímetros (como no código de referência)
+        double b = input.LarguraCm;              // cm
+        double h = input.AlturaCm;                // cm
+        double dLinha = input.DistFacesArmadurasCm; // cm
+        double d = h - dLinha;                    // cm
 
         if (d <= 0)
             throw new ArgumentException("Profundidade útil d inválida. Verifique altura da seção e distâncias às armaduras.");
 
-        // Momento característico (tf·m) -> kN·m
-        double Mk_kNm = input.MomentoTfm * EngineeringConstants.ConversaoTfParaKn;
-
-        // Momento de cálculo (ponderado + longa duração + redistr.)
-        double fatorRedist = 1.0 - input.RedistPercent / 100.0;
-        if (fatorRedist <= 0)
-            throw new ArgumentException("O fator de redistribuição de momentos deve resultar em valor positivo.");
-
-        double Msd_kNm = Mk_kNm * input.GammaF * input.Ktc * fatorRedist;
-
-        // Resistências de cálculo (em kN/m²)
-        double fcd = input.Fck * EngineeringConstants.ConversaoMpaParaKnm2 / input.GammaC;  // kN/m²
-        double fyd = input.Fyk * EngineeringConstants.ConversaoMpaParaKnm2 / input.GammaS;  // kN/m²
-
-        // Cálculo da altura da linha neutra x
-        double x = CalcularAlturaLinhaNeutra(b, d, fcd, Msd_kNm);
-
-        double profRelativa = x / d;
-
-        double As_m2;
-        double AsLinha_m2;
-        bool armaduraDupla = false;
-
-        // Verifica se é necessária armadura dupla (x/d > limite)
-        if (profRelativa <= limiteRelativo)
+        // Parâmetros do diagrama retangular conforme NBR 6118
+        double alamb;  // λ (lambda)
+        double alfac;  // αc (alpha c)
+        double eu;     // εu (deformação última do concreto)
+        
+        if (input.Fck <= 50)
         {
-            // Seção simples armada
-            double z = d - 0.4 * x;
-            As_m2 = Msd_kNm / (fyd * z);
-            AsLinha_m2 = 0.0;
+            alamb = 0.8;
+            alfac = 0.85;
+            eu = 3.5;
         }
         else
         {
-            // Seção duplamente armada
-            armaduraDupla = true;
-            double xLim = limiteRelativo * d;
-            double zLim = d - 0.4 * xLim;
-
-            // Momento máximo absorvido pela parte comprimida (até xLim)
-            double Mlim_kNm = EngineeringConstants.AlphaC * fcd * b * xLim * zLim;
-
-            if (Mlim_kNm <= 0 || Mlim_kNm > Msd_kNm)
-                throw new InvalidOperationException("Limite de linha neutra inconsistente para a combinação de carregamento e materiais.");
-
-            // Armadura tracionada correspondente ao momento Mlim
-            double As1_m2 = Mlim_kNm / (fyd * zLim);
-
-            // Momento excedente absorvido pelo par As / As'
-            double deltaM_kNm = Msd_kNm - Mlim_kNm;
-
-            double zDuple = d - dLinha; // braço de alavanca entre As e As'
-            if (zDuple <= 0)
-                throw new InvalidOperationException("Braço de alavanca entre armaduras negativo. Verifique distâncias às armaduras.");
-
-            AsLinha_m2 = deltaM_kNm / (fyd * zDuple);
-            As_m2 = As1_m2 + AsLinha_m2;
-
-            // Para fins de exibição, adotamos x limitado
-            x = xLim;
-            profRelativa = x / d;
+            alamb = 0.8 - (input.Fck - 50) / 400;
+            alfac = 0.85 * (1 - (input.Fck - 50) / 200);
+            double a = (90 - input.Fck) / 100;
+            eu = 2.6 + 35 * Math.Pow(a, 4);
         }
 
-        if (As_m2 <= 0)
+        // Determinar limite relativo da linha neutra (qlim)
+        double qlim;
+        if (!input.LimiteRelativoAutomatico && input.LimiteRelativo.HasValue)
+        {
+            qlim = input.LimiteRelativo.Value;
+        }
+        else
+        {
+            // Cálculo automático baseado no coeficiente de redistribuição (bduct)
+            // bduct = 1 - RedistPercent/100 (coeficiente de redistribuição)
+            double bduct = 1.0 - input.RedistPercent / 100.0;
+            
+            if (input.Fck <= 50)
+            {
+                qlim = 0.8 * bduct - 0.35;
+            }
+            else
+            {
+                qlim = 0.8 * bduct - 0.45;
+            }
+        }
+
+        if (qlim <= 0 || qlim >= 0.9)
+            throw new ArgumentException($"O limite relativo da linha neutra deve estar entre 0 e 0,9. Valor calculado: {qlim:F3}");
+
+        // Conversão de unidades para kN e cm (como no código de referência)
+        // Momento característico: tf·m -> kN·m -> kN·cm
+        double Mk_kNm = input.MomentoTfm * EngineeringConstants.ConversaoTfParaKn;
+        double Mk_kNcm = Mk_kNm * 100.0; // 1 m = 100 cm
+
+        // Resistências em kN/cm² (conforme código de referência)
+        // fck e fyk são convertidos de MPa para kN/cm² (dividindo por 10)
+        double fck_kNcm2 = input.Fck / 10.0;
+        double fyk_kNcm2 = input.Fyk / 10.0;
+
+        // Resistências de cálculo
+        // Nota: O código de referência não aplica ktc explicitamente na resistência do concreto
+        // O ktc pode ser usado em outros contextos, mas aqui seguimos o código de referência
+        double fcd = fck_kNcm2 / input.GammaC;  // kN/cm²
+        double tcd = alfac * fcd;  // Tensão de cálculo do concreto (já com alfac aplicado)
+        double fyd = fyk_kNcm2 / input.GammaS;  // kN/cm²
+
+        // Momento de cálculo
+        double Md_kNcm = input.GammaF * Mk_kNcm;
+
+        // Parâmetro geométrico
+        double delta = dLinha / d;
+
+        // Momento limite reduzido
+        double amilim = alamb * qlim * (1 - 0.5 * alamb * qlim);
+
+        // Momento reduzido solicitante
+        double ami = Md_kNcm / (b * d * d * tcd);
+
+        double As_cm2;
+        double AsLinha_cm2;
+        double x_cm;
+        double profRelativa;
+        bool armaduraDupla = false;
+
+        if (ami <= amilim)
+        {
+            // Armadura simples
+            double qsi = (1 - Math.Sqrt(1 - 2 * ami)) / alamb;
+            As_cm2 = alamb * qsi * b * d * tcd / fyd;
+            AsLinha_cm2 = 0.0;
+            x_cm = qsi * d;
+            profRelativa = qsi;
+        }
+        else
+        {
+            // Armadura dupla
+            armaduraDupla = true;
+
+            // Evitando armadura dupla no domínio 2
+            double qsia = eu / (eu + 10);
+            if (qlim < qsia)
+            {
+                throw new InvalidOperationException("Resultou armadura dupla no domínio 2. Aumente as dimensões da seção transversal.");
+            }
+
+            // Eliminando o caso em que qlim <= delta
+            // Se isto ocorrer, a armadura de compressão estará tracionada
+            if (qlim <= delta)
+            {
+                throw new InvalidOperationException("Aumente as dimensões da seção transversal.");
+            }
+
+            // Deformação da armadura de compressão
+            double esl = eu * (qlim - delta) / qlim;
+            esl = esl / 1000.0; // Convertendo de % para decimal
+
+            // Tensão na armadura de compressão
+            double tsl = CalcularTensaoAco(esl, fyd, 21000.0); // Es = 210 GPa = 21000 kN/cm²
+
+            AsLinha_cm2 = (ami - amilim) * b * d * tcd / ((1 - delta) * tsl);
+            As_cm2 = (alamb * qlim + (ami - amilim) / (1 - delta)) * b * d * tcd / fyd;
+
+            // Para fins de exibição, adotamos x limitado
+            x_cm = qlim * d;
+            profRelativa = qlim;
+        }
+
+        if (As_cm2 <= 0)
             throw new InvalidOperationException("Área de aço tracionada calculada não positiva. Verifique dados de entrada.");
 
-        // Conversão para cm²
-        double As_cm2 = As_m2 * EngineeringConstants.ConversaoM2ParaCm2;
-        double AsLinha_cm2 = AsLinha_m2 * EngineeringConstants.ConversaoM2ParaCm2;
-        double x_cm = x * EngineeringConstants.ConversaoCmParaM;
+        // Verificação de armadura mínima
+        // fyd já está em kN/cm², mas a fórmula espera em MPa, então convertemos de volta
+        double fyd_MPa = fyd * 10.0; // kN/cm² -> MPa (1 MPa = 0.1 kN/cm², então multiplicamos por 10)
+        double asmin = CalcularArmaduraMinima(input.Fck, fyd_MPa, b, h);
+        if (As_cm2 < asmin)
+        {
+            As_cm2 = asmin;
+        }
 
         return new DimensionamentoFlexaoOutput
         {
@@ -127,74 +185,56 @@ public class DimensionamentoFlexaoService
     }
 
     /// <summary>
-    /// Determina o limite relativo da linha neutra baseado nas configurações de entrada.
+    /// Calcula a tensão no aço baseada na deformação.
     /// </summary>
-    private double DeterminarLimiteRelativo(DimensionamentoFlexaoInput input)
+    private static double CalcularTensaoAco(double esl, double fyd, double es)
     {
-        if (!input.LimiteRelativoAutomatico && input.LimiteRelativo.HasValue)
+        // Trabalhando com deformação positiva
+        double ess = Math.Abs(esl);
+        double eyd = fyd / es;
+        
+        double tsl;
+        if (ess < eyd)
         {
-            return input.LimiteRelativo.Value;
+            tsl = es * ess;
+        }
+        else
+        {
+            tsl = fyd;
         }
 
-        // Valores típicos de projeto (simplificados):
-        // NBR 6118: 0,45 para CA-50 / concretos usuais
-        // Eurocode 2: 0,45 (aproximação para aço classe B)
-        double limiteRelativo = EngineeringConstants.LimiteRelativoPadrao;
-
-        // Ajuste opcional bem simples: se aço de maior resistência, reduzir um pouco o limite
-        if (!input.UsaNBR6118 && input.Fyk >= 600)
+        // Trocando o sinal se necessário
+        if (esl < 0)
         {
-            limiteRelativo = EngineeringConstants.LimiteRelativoAcoAltaResistencia;
+            tsl = -tsl;
         }
 
-        return limiteRelativo;
+        return tsl;
     }
 
     /// <summary>
-    /// Calcula a altura da linha neutra x resolvendo a equação do bloco retangular simplificado.
-    /// Msd = αc * fcd * b * x * (d - 0,4 x)
+    /// Calcula a armadura mínima conforme NBR 6118.
     /// </summary>
-    private double CalcularAlturaLinhaNeutra(double b, double d, double fcd, double Msd_kNm)
+    private static double CalcularArmaduraMinima(double fck, double fyd, double b, double h)
     {
-        // Equação: Msd = αc * fcd * b * x * (d - 0,4 x)
-        // Rearranjando: -0,4 * αc * fcd * b * x² + αc * fcd * b * d * x - Msd = 0
-        // Forma: a*x² + b*x + c = 0
-        double a = -0.4 * EngineeringConstants.AlphaC * fcd * b;
-        double bq = EngineeringConstants.AlphaC * fcd * b * d;
-        double c = -Msd_kNm;
+        double romin;
+        double a = 2.0 / 3.0;
 
-        double delta = bq * bq - 4.0 * a * c;
-        if (delta < 0)
-            throw new InvalidOperationException("Não foi possível encontrar uma solução para a linha neutra (equação sem raiz real). Verifique valores de entrada.");
+        if (fck <= 50)
+        {
+            romin = 0.078 * Math.Pow(fck, a) / fyd;
+        }
+        else
+        {
+            romin = 0.5512 * Math.Log(1 + 0.11 * fck) / fyd;
+        }
 
-        double sqrtDelta = Math.Sqrt(delta);
+        if (romin < 0.0015)
+        {
+            romin = 0.0015;
+        }
 
-        // Duas raízes; escolhemos a fisicamente admissível (0 < x < d)
-        double x1 = (-bq + sqrtDelta) / (2.0 * a);
-        double x2 = (-bq - sqrtDelta) / (2.0 * a);
-
-        double x = EscolherRaizFisica(x1, x2, d);
-        if (double.IsNaN(x))
-            throw new InvalidOperationException("Altura da linha neutra fora do intervalo físico (0 < x < d). Verifique os dados.");
-
-        return x;
-    }
-
-    /// <summary>
-    /// Escolhe a raiz fisicamente admissível (0 < x < d) entre duas soluções.
-    /// </summary>
-    private static double EscolherRaizFisica(double x1, double x2, double d)
-    {
-        bool RaizValida(double x) => x > 0 && x < d && !double.IsNaN(x) && !double.IsInfinity(x);
-
-        if (RaizValida(x1) && !RaizValida(x2))
-            return x1;
-        if (RaizValida(x2) && !RaizValida(x1))
-            return x2;
-        if (RaizValida(x1) && RaizValida(x2))
-            return Math.Min(x1, x2); // escolhe a menor positiva
-
-        return double.NaN;
+        return romin * b * h;
     }
 
     /// <summary>
@@ -205,4 +245,3 @@ public class DimensionamentoFlexaoService
         ValidationHelper.ValidarMaiorQueZero(valor, nomeCampo);
     }
 }
-

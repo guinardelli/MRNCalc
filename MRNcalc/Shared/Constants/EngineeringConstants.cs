@@ -24,12 +24,6 @@ public static class EngineeringConstants
     public const double LimiteRelativoPadrao = 0.45;
 
     /// <summary>
-    /// Limite relativo da linha neutra para aços de alta resistência (fy ≥ 600 MPa).
-    /// Valor reduzido conforme Eurocode 2.
-    /// </summary>
-    public const double LimiteRelativoAcoAltaResistencia = 0.40;
-
-    /// <summary>
     /// Fator de conversão de megapascal (MPa) para kilonewton por metro quadrado (kN/m²).
     /// 1 MPa = 1000 kN/m².
     /// </summary>

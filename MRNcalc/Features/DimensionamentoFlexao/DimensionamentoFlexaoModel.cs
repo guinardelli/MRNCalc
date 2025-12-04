@@ -61,11 +61,6 @@ public class DimensionamentoFlexaoInput
     public double RedistPercent { get; set; }
 
     /// <summary>
-    /// Indica se deve usar NBR 6118 (true) ou Eurocode 2 (false).
-    /// </summary>
-    public bool UsaNBR6118 { get; set; }
-
-    /// <summary>
     /// Limite relativo da linha neutra (x/d). Usado quando não é automático.
     /// </summary>
     public double? LimiteRelativo { get; set; }

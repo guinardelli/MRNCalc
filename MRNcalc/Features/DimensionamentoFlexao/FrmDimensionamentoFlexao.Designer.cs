@@ -14,7 +14,6 @@ partial class FrmDimensionamentoFlexao
     private TableLayoutPanel tableLayoutMain;
     private GroupBox grpNorma;
     private RadioButton rdbNBR6118;
-    private RadioButton rdbEurocode;
     private GroupBox grpSecao;
     private TextBox txtLargura;
     private TextBox txtAltura;
@@ -56,7 +55,6 @@ partial class FrmDimensionamentoFlexao
         tableLayoutMain = new TableLayoutPanel();
         grpNorma = new GroupBox();
         rdbNBR6118 = new RadioButton();
-        rdbEurocode = new RadioButton();
         grpSecao = new GroupBox();
         txtLargura = new TextBox();
         txtAltura = new TextBox();
@@ -132,11 +130,7 @@ partial class FrmDimensionamentoFlexao
         rdbNBR6118.Location = new Point(10, 22);
         rdbNBR6118.Text = "NBR 6118 / 2023";
         rdbNBR6118.Checked = true;
-        rdbEurocode.AutoSize = true;
-        rdbEurocode.Location = new Point(10, 43);
-        rdbEurocode.Text = "Eurocode 2 / 2023";
         grpNorma.Controls.Add(rdbNBR6118);
-        grpNorma.Controls.Add(rdbEurocode);
 
         // 
         // grpSecao
@@ -189,7 +183,7 @@ partial class FrmDimensionamentoFlexao
         cmbFck.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
         cmbFck.Location = new Point(130, 22);
         cmbFck.Size = new Size(60, 23);
-        cmbFck.Items.AddRange(new object[] { "20", "25", "30", "35", "40" });
+        cmbFck.Items.AddRange(new object[] { "20", "25", "30", "35", "40", "45", "50", "55", "60", "65", "70", "75", "80", "85", "90" });
         cmbFck.SelectedIndex = 2; // 30
         lblFyk.AutoSize = true;
         lblFyk.Location = new Point(10, 55);

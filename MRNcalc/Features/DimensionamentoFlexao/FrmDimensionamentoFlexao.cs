@@ -187,7 +187,6 @@ public partial class FrmDimensionamentoFlexao : Form
             GammaS = ValidationHelper.ParseDouble(txtGammaS.Text, "γs"),
             Ktc = ValidationHelper.ParseDouble(txtKtc.Text, "ktc"),
             RedistPercent = ValidationHelper.ParseDouble(txtRedist.Text, "Redistribuição de momentos"),
-            UsaNBR6118 = rdbNBR6118.Checked,
             LimiteRelativoAutomatico = rdbLimiteAutomatico.Checked,
             LimiteRelativo = rdbLimiteAutomatico.Checked
                 ? null
